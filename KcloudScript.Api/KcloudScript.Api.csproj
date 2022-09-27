@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
+    <PackageReference Include="Serilog.Filters.Expressions" Version="2.1.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KcloudScript.Model\KcloudScript.Model.csproj" />
+    <ProjectReference Include="..\KcloudScript.Service\KcloudScript.Service.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Logs\" />
+    <Folder Include="resources\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="resources\PhoneNumbers-8-digits.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
