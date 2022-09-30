@@ -8,6 +8,7 @@
  *******************************************************************************/
 using KcloudScript.Model;
 using KcloudScript.Service;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
@@ -20,19 +21,21 @@ using System.Threading.Tasks;
 
 namespace KcloudScript.Api.Controllers
 {
-    [Route("api/[controller]")]
+    //[Route("api/[controller]")]
     [ApiController]
     public class ShortUrlController : BaseController
     {
         private readonly IShortUrlService shortUrlService;
         private readonly ILogger<ShortUrlController> logger;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private IOptions<AppSettingsEntity> appSettings;
         private object? nullObject = null;
-        public ShortUrlController(IShortUrlService _shortUrlService, ILogger<ShortUrlController> _logger, IOptions<AppSettingsEntity> _appSettings)
+        public ShortUrlController(IShortUrlService _shortUrlService, ILogger<ShortUrlController> _logger, IOptions<AppSettingsEntity> _appSettings, IHttpContextAccessor _httpContextAccessor)
         {
             shortUrlService = _shortUrlService;
             logger = _logger;
             appSettings = _appSettings;
+            httpContextAccessor = _httpContextAccessor;
         }
 
         /// <summary>
@@ -40,7 +43,7 @@ namespace KcloudScript.Api.Controllers
         /// </summary>
         /// <param name="originalUrl"></param>
         /// <returns></returns>
-        [HttpPost("GenerateUrl")]
+        [HttpPost("api/[controller]/GenerateUrl")]
         public async Task<IActionResult> CreateShortenUrl(UrlRequestEntity originalUrl)
         {
             try
@@ -48,7 +51,8 @@ namespace KcloudScript.Api.Controllers
                 if (ModelState.IsValid)
                 {
                     string result = await shortUrlService.GenerateShortUrl(originalUrl.RequestUrl, appSettings.Value.SlidingExpiry, appSettings.Value.AbsExpiry);
-                    return SetResponse(HttpStatusCode.OK, true, result, CommonMessage.Success);
+                    string host = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host.Value}/rdata/{result}";
+                    return SetResponse(HttpStatusCode.OK, true, host, CommonMessage.Success);
                 }
                 else
                 {
@@ -73,7 +77,7 @@ namespace KcloudScript.Api.Controllers
         /// </summary>
         /// <param name="shortanUrl"></param>
         /// <returns></returns>
-        [HttpGet("GetUrl")]
+        [HttpGet("rdata/{shortanUrl}")]
         public async Task<IActionResult> GetOriginalUrl(string shortanUrl)
         {
             try
@@ -82,8 +86,7 @@ namespace KcloudScript.Api.Controllers
                 if (string.IsNullOrEmpty(url) == false)
                 {
                     RedirectResult redirectUrl = Redirect(url);
-                    Response.Redirect(redirectUrl.Url);
-                    return SetResponse(HttpStatusCode.Redirect, false, redirectUrl.Url, CommonMessage.Success);
+                    return Redirect(redirectUrl.Url);
                 }
                 else
                 {

@@ -2,6 +2,7 @@ using KcloudScript.Model;
 using KcloudScript.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -41,8 +42,9 @@ namespace KcloudScript.Api
             services.AddControllers();
             services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder =>
             {
-                builder.AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
             }));
+
             services.AddSwaggerGen(swagger =>
             {
                 swagger.SwaggerDoc("v1", new OpenApiInfo { Title = "KcloudScript.Api", Version = "v1" });
@@ -63,7 +65,7 @@ namespace KcloudScript.Api
                c.DefaultRequestHeaders.Add("Connection", "Keep-alive");
                c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
            });
-
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             RegisterServices(ref services);
         }
 

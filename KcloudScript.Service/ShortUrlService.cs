@@ -32,7 +32,7 @@ namespace KcloudScript.Service
         public async Task<string> GenerateShortUrl(string? url, int slideExpiry, int absExpiry)
         {
             string shortenUrl = string.Empty;
-            shortenUrl = UrlOperations.GenerateUrl();
+            shortenUrl = StringOperation.RandomString(5);
             Dictionary<string, string>? urls = await memeoryConfig.GetObjectFromMemory(urlCacheKey) as Dictionary<string, string>;
             if (urls == null)
             {
